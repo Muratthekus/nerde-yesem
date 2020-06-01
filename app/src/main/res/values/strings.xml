@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">nerdeyesem</string>
+    <string name="finger_print_to_open">
+        Giris yapabilmek için lütfen parmagınızı taratın </string>
+    <string name="nerdeyesem_login_title">Nerde Yesem\'e Hosgeldiniz</string>
+    <string name="hardware_detected_error">Cihazınız bu islemi desteklemiyor</string>
+    <string name="fingerprint_permission_request">Lutfen ayarlardan uygulamaya izin verin</string>
+    <string name="no_configured_fingerprint">Kayıtlı parmak izi yok</string>
+    <string name="enable_lockScreen_security">Ekran korumasını cihazınızda aktif edin</string>
+    <string name="fingerprint_authentication_failed">Parmak izi dogrulanırken bir hata olustu</string>
+    <string name="fingerprint_authentication_success">Parmak izi dogrulaması basarılı</string>
+
+</resources>
