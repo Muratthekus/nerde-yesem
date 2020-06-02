@@ -8,6 +8,9 @@ android {
     viewBinding {
         enabled = true
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
     defaultConfig {
         applicationId "com.thekusch.nerdeyesem"
         minSdkVersion 26
@@ -39,7 +42,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
-    implementation 'androidx.biometric:biometric:1.0.1'
+    implementation 'com.github.ajalt:timberkt:1.5.1'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'

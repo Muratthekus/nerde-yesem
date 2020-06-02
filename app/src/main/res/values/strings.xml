@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">nerdeyesem</string>
+
+    <!-- Displayed strings in app -->
     <string name="finger_print_to_open">
         Giris yapabilmek için lütfen parmagınızı taratın </string>
     <string name="nerdeyesem_login_title">Nerde Yesem\'e Hosgeldiniz</string>
@@ -9,5 +11,9 @@
     <string name="enable_lockScreen_security">Ekran korumasını cihazınızda aktif edin</string>
     <string name="fingerprint_authentication_failed">Parmak izi dogrulanırken bir hata olustu</string>
     <string name="fingerprint_authentication_success">Parmak izi dogrulaması basarılı</string>
+    <string name="enable_location_settings">Konum hizmetlerinizi aktif edin</string>
+    <string name="location_information_fetch">Konum bilgileriniz alınıyor...</string>
+    <string name="location_information_cant_fetch">Güncel konum bilgisi alınamıyor</string>
+    <string name="location_information_fetch_start_again">Güncel konum bilgisi alınmaya başlandı</string>
 
 </resources>
