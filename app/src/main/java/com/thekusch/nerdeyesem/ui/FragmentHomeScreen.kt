@@ -1,8 +1,12 @@
 package com.thekusch.nerdeyesem.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.view.Gravity
 import androidx.fragment.app.Fragment
@@ -10,21 +14,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.util.component1
-import androidx.core.util.component2
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.thekusch.nerdeyesem.LocationListenerService
-import com.thekusch.nerdeyesem.LocationPermission
-
+import com.thekusch.nerdeyesem.locations.LocationListenerService
 import com.thekusch.nerdeyesem.R
+import com.thekusch.nerdeyesem.data.Status
 import com.thekusch.nerdeyesem.databinding.FragmentHomeScreenBinding
+import com.thekusch.nerdeyesem.viewmodel.ApiDataSource
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import com.github.ajalt.timberkt.Timber
+import com.thekusch.nerdeyesem.data.Status.*
+import com.thekusch.nerdeyesem.viewmodel.NetworkViewModel
 
 
 class FragmentHomeScreen : Fragment() {
-    private lateinit var locationPermission : LocationPermission
     private val PERMISSION_ID = 35
     private var isServiceConnected = false
+    private lateinit var mService:LocationListenerService
+
     private lateinit var binding: FragmentHomeScreenBinding
+
+    //view model
+    private lateinit var networkViewModel:NetworkViewModel
+
+    //Thread
+    private val handler = Handler()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,10 +54,22 @@ class FragmentHomeScreen : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        checkLocationPermission()
+        startFetchLocation()
         serviceCommunication()
+        networkViewModel = ViewModelProviders.of(this).get(NetworkViewModel::class.java)
+        networkProcess()
     }
-
+    //Observe the request status
+    private fun networkProcess(){
+        networkViewModel.nearbyApiConnection(38.410481,27.128403)
+        networkViewModel.nearbyResultObservable.observe(this, Observer {
+            when(it.status){
+                SUCCESS -> TODO()
+                ERROR -> TODO()
+                LOADING -> TODO()
+            }
+        })
+    }
     //Bind service
     private fun serviceConnection(){
         val serviceConnection : ServiceConnection = object : ServiceConnection {
@@ -49,13 +80,16 @@ class FragmentHomeScreen : Fragment() {
                 val binder: LocationListenerService.LocalBinder =
                     service as LocationListenerService.LocalBinder
                 isServiceConnected=true
+                mService = binder.getService()
                 showToast(getString(R.string.location_information_fetch))
             }
         }
-        val intent = Intent(activity,LocationListenerService::class.java)
+        val intent = Intent(activity,
+            LocationListenerService::class.java)
         activity!!.bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE)
     }
-    //Receiver message from location listener service
+
+    //Receive message from location listener service
     private fun serviceCommunication(){
         val mReceiver : BroadcastReceiver = object :BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -72,20 +106,33 @@ class FragmentHomeScreen : Fragment() {
         LocalBroadcastManager.getInstance(context!!).registerReceiver(mReceiver, IntentFilter("LOCATION_SERVICE_PROVIDER_STATUS"))
     }
 
-    private fun checkLocationPermission(){
-        locationPermission = LocationPermission(requireActivity())
+    private fun startFetchLocation(){
         //Permission granted
-        if(locationPermission.checkPermission()){
-            isLocationEnable()
+        if(checkPermission()){
+            locationStatus()
         }
         //Request permission
         else{
-            locationPermission.requestPermission()
+            permissionRequest()
         }
     }
     //If location enable, start service
-    private fun isLocationEnable(){
-        if(locationPermission.isLocationEnable()){
+    private fun checkPermission():Boolean{
+        if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        return false
+    }
+    private fun permissionRequest(){
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+            PERMISSION_ID)
+    }
+    private fun locationStatus(){
+        val locationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val status = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER)
+        if(status){
             serviceConnection()
         }
         else{
@@ -103,7 +150,7 @@ class FragmentHomeScreen : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_ID) {
             if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                isLocationEnable()
+                locationStatus()
             }
         }
     }

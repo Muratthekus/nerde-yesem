@@ -13,7 +13,7 @@
     <string name="fingerprint_authentication_success">Parmak izi dogrulaması basarılı</string>
     <string name="enable_location_settings">Konum hizmetlerinizi aktif edin</string>
     <string name="location_information_fetch">Konum bilgileriniz alınıyor...</string>
-    <string name="location_information_cant_fetch">Güncel konum bilgisi alınamıyor</string>
-    <string name="location_information_fetch_start_again">Güncel konum bilgisi alınmaya başlandı</string>
+    <string name="location_information_cant_fetch">GPS kapalı. Güncel konum bilgisi alınamıyor. GPS hizmetlerini aktif edin.</string>
+    <string name="location_information_fetch_start_again">GPS aktif. Güncel konum bilgisi alınmaya başlandı</string>
 
 </resources>

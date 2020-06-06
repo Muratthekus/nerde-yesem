@@ -1,4 +1,4 @@
-package com.thekusch.nerdeyesem
+package com.thekusch.nerdeyesem.locations
 
 import android.Manifest
 import android.app.Service
@@ -11,10 +11,7 @@ import android.location.LocationManager
 import android.os.Binder
 import android.os.Bundle
 import android.os.IBinder
-import android.text.BoringLayout
-import android.util.Log
 import android.util.Pair
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.ajalt.timberkt.Timber
@@ -22,14 +19,14 @@ import com.github.ajalt.timberkt.Timber
 class LocationListenerService : Service(), LocationListener {
     private lateinit var locationManager:LocationManager
     //private lateinit var locationLocationManager: LocationManager
-    private val LOCATION_UPDATE_TIME :Long = 10//millisecond
-    private val LOCATION_UPDATE_DISTANCE :Float = 1f
+    private val LOCATION_UPDATE_TIME :Long = 100000//millisecond -> 10SN
+    private val LOCATION_UPDATE_DISTANCE :Float = 100f
 
     private val iBinder:IBinder=LocalBinder()
 
     //lambda function
     //return true if provider enable else false
-    private val providerStatus : (LocationProviderStatus) -> Boolean = {it==LocationProviderStatus.ENABLE}
+    private val providerStatus : (LocationProviderStatus) -> Boolean = {it== LocationProviderStatus.ENABLE }
 
     //Location value
     private var mLongitude:Double= 0.0
@@ -44,7 +41,7 @@ class LocationListenerService : Service(), LocationListener {
         return iBinder
     }
     inner class LocalBinder: Binder(){
-        fun getService():LocationListenerService{
+        fun getService(): LocationListenerService {
             return this@LocationListenerService
         }
     }
@@ -81,10 +78,10 @@ class LocationListenerService : Service(), LocationListener {
         sendMessage(LocationProviderStatus.DISABLE)
     }
     //Send message to fragment about provider status
-    private fun sendMessage(providerStat:LocationProviderStatus){
+    private fun sendMessage(providerStat: LocationProviderStatus){
         val intent = Intent("LOCATION_SERVICE_PROVIDER_STATUS")
         intent.putExtra("providerEnable",providerStatus.invoke(providerStat))
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
     }
     fun getLocation():Pair<Double,Double>{
         /**

@@ -32,7 +32,7 @@ import javax.crypto.spec.IvParameterSpec
 
 
 class FragmentLoginScreen : Fragment() {
-    private lateinit var binding:FragmentLoginScreenBinding
+
 
     //Fingerprint
     private lateinit var fingerprintManager :FingerprintManager
@@ -48,6 +48,8 @@ class FragmentLoginScreen : Fragment() {
     private val handler = Handler()
     private val checkRequirementsRunn = Runnable { checkRequirements() }
     private lateinit var checkResultRunn : Runnable
+
+    private lateinit var binding:FragmentLoginScreenBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,10 +67,11 @@ class FragmentLoginScreen : Fragment() {
         keyguardManager = activity!!.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
 
         //start checking fingerprint login requirements
-        handler.post(checkRequirementsRunn)
+        handler.postDelayed(checkRequirementsRunn,10)
 
     }
     private fun checkRequirements(){
+        var prev_msg:String? = null
         val msg = requirementCheckResult()
         if(msg==null){
             handler.removeCallbacks(checkRequirementsRunn)
@@ -84,7 +87,11 @@ class FragmentLoginScreen : Fragment() {
             }
         }
         else{
-            Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
+            if(msg!=prev_msg){
+                Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
+                prev_msg=msg
+            }
+            handler.postDelayed(checkRequirementsRunn,10)
         }
     }
     //control the finger print login result
@@ -113,14 +120,16 @@ class FragmentLoginScreen : Fragment() {
 
     //Access to android keyStore and generate encryption key
     private fun getKey(){
+        //Reference to the Keystore using standard Android keystore container identifier
         keyStore = KeyStore.getInstance("AndroidKeyStore")
+        //Generate a key
         keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,"AndroidKeyStore")
         keyStore.load(null)//initialize as empty
         keyGenerator.init(
             KeyGenParameterSpec
             .Builder(KEY, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
             .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-            .setUserAuthenticationRequired(true)
+            .setUserAuthenticationRequired(true)//user has to confirm their identity with a fingerprint
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
             .build())
         keyGenerator.generateKey()

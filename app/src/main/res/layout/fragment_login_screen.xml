@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:gravity="center"
         android:id="@+id/login_title"
         style="@style/TextAppearance.AppCompat.Large"
         android:layout_width="wrap_content"
@@ -26,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textSize="18sp"
+        android:gravity="center"
         android:text="@string/finger_print_to_open"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
