@@ -19,6 +19,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.thekusch.nerdeyesem.locations.LocationListenerService
 import com.thekusch.nerdeyesem.R
 import com.thekusch.nerdeyesem.data.Status
@@ -27,11 +29,14 @@ import com.thekusch.nerdeyesem.viewmodel.ApiDataSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import com.github.ajalt.timberkt.Timber
+import com.thekusch.nerdeyesem.adapter.RestaurantListAdapter
 import com.thekusch.nerdeyesem.data.Status.*
+import com.thekusch.nerdeyesem.data.model.nearby.NearbyRestaurant
 import com.thekusch.nerdeyesem.viewmodel.NetworkViewModel
 
 
-class FragmentHomeScreen : Fragment() {
+class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
+
     private val PERMISSION_ID = 35
     private var isServiceConnected = false
     private lateinit var mService:LocationListenerService
@@ -43,12 +48,21 @@ class FragmentHomeScreen : Fragment() {
 
     //Thread
     private val handler = Handler()
+    private var waitServiceConnectionRunn:Runnable = Runnable {waitServiceConnection()}
+    //Recyclerview
+    private lateinit var recyclerView:RecyclerView
+    private lateinit var adapter:RestaurantListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeScreenBinding.inflate(inflater,container,false)
+
+        recyclerView = binding.restaurantRecycler
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.setHasFixedSize(true)
+
         return binding.root
     }
 
@@ -56,17 +70,36 @@ class FragmentHomeScreen : Fragment() {
         super.onActivityCreated(savedInstanceState)
         startFetchLocation()
         serviceCommunication()
+
+        adapter = RestaurantListAdapter()
+        recyclerView.adapter = adapter
+        adapter.setItemClickListener(this)
+
         networkViewModel = ViewModelProviders.of(this).get(NetworkViewModel::class.java)
         networkProcess()
+    }
+    private fun waitServiceConnection(){
+
     }
     //Observe the request status
     private fun networkProcess(){
         networkViewModel.nearbyApiConnection(38.410481,27.128403)
         networkViewModel.nearbyResultObservable.observe(this, Observer {
             when(it.status){
-                SUCCESS -> TODO()
-                ERROR -> TODO()
-                LOADING -> TODO()
+                SUCCESS ->
+                {
+                    binding.loadingComponent.visibility = View.GONE
+                    binding.pleaseWaitText.visibility = View.GONE
+                    binding.headerUserLocation.visibility = View.VISIBLE
+                    binding.restaurantRecycler.visibility = View.VISIBLE
+                    it.data?.nearbyRestaurants?.let { it1 -> adapter.setData(it1) }
+                }
+                ERROR ->
+                {
+                    showToast(getString(R.string.request_error_try_later_will_fix_it))
+                    binding.pleaseWaitText.text = it.msg
+                }
+                LOADING -> binding.pleaseWaitText.text = getString(R.string.try_to_connect_server)
             }
         })
     }
@@ -106,6 +139,7 @@ class FragmentHomeScreen : Fragment() {
         LocalBroadcastManager.getInstance(context!!).registerReceiver(mReceiver, IntentFilter("LOCATION_SERVICE_PROVIDER_STATUS"))
     }
 
+    //Start fetch location process
     private fun startFetchLocation(){
         //Permission granted
         if(checkPermission()){
@@ -116,7 +150,8 @@ class FragmentHomeScreen : Fragment() {
             permissionRequest()
         }
     }
-    //If location enable, start service
+
+    //Check if location permission granted
     private fun checkPermission():Boolean{
         if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -124,10 +159,12 @@ class FragmentHomeScreen : Fragment() {
         }
         return false
     }
+
     private fun permissionRequest(){
         requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
             PERMISSION_ID)
     }
+
     private fun locationStatus(){
         val locationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val status = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
@@ -159,6 +196,10 @@ class FragmentHomeScreen : Fragment() {
         val toast = Toast.makeText(context,msg,Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER,0,0)
         toast.show()
+    }
+
+    override fun onItemClick(res_id: Int?) {
+        showToast("TIKLANDI KANKA")
     }
 
 }

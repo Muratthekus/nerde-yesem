@@ -9,10 +9,6 @@ class NearbyResult{
     @Expose
     var location: UserLocation? = null
 
-    @SerializedName("popularity")
-    @Expose
-    var popularity:Popularity? = null
-
     @SerializedName("nearby_restaurants")
     @Expose
     var nearbyRestaurants: List<NearbyRestaurant>? = null

@@ -12,8 +12,11 @@
     <string name="fingerprint_authentication_failed">Parmak izi dogrulanırken bir hata olustu</string>
     <string name="fingerprint_authentication_success">Parmak izi dogrulaması basarılı</string>
     <string name="enable_location_settings">Konum hizmetlerinizi aktif edin</string>
-    <string name="location_information_fetch">Konum bilgileriniz alınıyor...</string>
+    <string name="location_information_fetch">Konum bilgileriniz alınıyor…</string>
     <string name="location_information_cant_fetch">GPS kapalı. Güncel konum bilgisi alınamıyor. GPS hizmetlerini aktif edin.</string>
     <string name="location_information_fetch_start_again">GPS aktif. Güncel konum bilgisi alınmaya başlandı</string>
-
+    <string name="please_wait">Lütfen bekleyin</string>
+    <string name="try_to_connect_server">Server\'a baglanılmaya çalışılıyor</string>
+    <string name="request_error_try_later_will_fix_it">Bir hata oluştu. Sorunu çözmeye çalışıyoruz. Daha sonra tekrar deneyin</string>
+    <string name="your_location">Bulunduğunuz konum:</string>
 </resources>
