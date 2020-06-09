@@ -5,6 +5,11 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="appBackground">#F4EAEA</color>
     <color name="recyclerViewItemColor">#FFF6F6</color>
+    <color name="homeHeader">#ECCB1C</color>
+    <color name="detailedColor1">#424549</color>
+    <color name="detailedColor2">#7e455e</color>
+    <color name="detailedColor3">#796e25</color>
+    <color name="detailedColor4">#59717c</color>
     <color name="white">#FFFFFF</color>
     <color name="ivory">#FFFFF0</color>
     <color name="light_yellow">#FFFFE0</color>

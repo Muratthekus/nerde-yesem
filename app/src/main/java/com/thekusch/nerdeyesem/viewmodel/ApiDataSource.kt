@@ -34,10 +34,9 @@ class ApiDataSource {
 
         }
     }
-    fun fetchDetailedRestaurant(res_id:Int):Observable<Resource<DetailedResult>>{
+    fun fetchDetailedRestaurant(res_id:Int?):Observable<Resource<DetailedResult>>{
         return Observable.create { emitter ->
             emitter.onNext(Resource.loading())
-
             retrofitProvider
                 .API
                 .getRestaurant(BuildConfig.API_KEY,res_id)

@@ -18,5 +18,11 @@
     <string name="please_wait">Lütfen bekleyin</string>
     <string name="try_to_connect_server">Server\'a baglanılmaya çalışılıyor</string>
     <string name="request_error_try_later_will_fix_it">Bir hata oluştu. Sorunu çözmeye çalışıyoruz. Daha sonra tekrar deneyin</string>
-    <string name="your_location">Bulunduğunuz konum:</string>
+    <string name="top_cousines_in_here">Bu bölgedeki popüler mutfaklar:</string>
+    <string name="waiting_for_gps_connection">GPS\'in aktif olması bekleniyor</string>
+    <string name="worse">Berbat</string>
+    <string name="bad">Kötü</string>
+    <string name="average">Ortalama</string>
+    <string name="good">İyi</string>
+    <string name="excellent">Mükemmel</string>
 </resources>

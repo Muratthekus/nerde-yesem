@@ -17,5 +17,5 @@ interface EndPoints {
 
     @GET("restaurant")
     fun getRestaurant(@Header("user-key")token:String,
-                      @Query("res_id") res_id:Int):Single<DetailedResult>
+                      @Query("res_id") res_id:Int?):Single<DetailedResult>
 }

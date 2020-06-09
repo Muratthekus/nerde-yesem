@@ -1,6 +1,7 @@
 package com.thekusch.nerdeyesem.viewmodel
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.thekusch.nerdeyesem.data.Resource
@@ -12,6 +13,7 @@ import io.reactivex.schedulers.Schedulers
 
 class NetworkViewModel: ViewModel(){
     private val apiDataSource = ApiDataSource()
+
 
     //To observe status of request
     var nearbyResultObservable : MutableLiveData<NetworkDataClass<NearbyResult>> = MutableLiveData()
@@ -33,7 +35,7 @@ class NetworkViewModel: ViewModel(){
     }
 
     @SuppressLint("CheckResult")
-    fun detailedInfoApiConnection(res_id:Int){
+    fun detailedInfoApiConnection(res_id:Int?){
         apiDataSource
             .fetchDetailedRestaurant(res_id)
             .subscribeOn(Schedulers.io())

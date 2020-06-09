@@ -19,8 +19,8 @@ import com.github.ajalt.timberkt.Timber
 class LocationListenerService : Service(), LocationListener {
     private lateinit var locationManager:LocationManager
     //private lateinit var locationLocationManager: LocationManager
-    private val LOCATION_UPDATE_TIME :Long = 100000//millisecond -> 10SN
-    private val LOCATION_UPDATE_DISTANCE :Float = 100f
+    private val LOCATION_UPDATE_TIME :Long = 3000//millisecond -> 10SN
+    private val LOCATION_UPDATE_DISTANCE :Float = 10f
 
     private val iBinder:IBinder=LocalBinder()
 

@@ -3,17 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="8dp"
+    android:paddingTop="5dp"
     android:translationZ="2dp"
     android:elevation="10dp"
-    app:cardCornerRadius="10dp"
     android:background="@color/recyclerViewItemColor">
 
     <RelativeLayout
+        android:id="@+id/mainWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
-
+        android:layout_marginBottom="5dp">
         <TextView
             android:id="@+id/resName"
             android:text="Restaurant adı.."
@@ -44,7 +43,6 @@
             android:text="L"
             android:layout_marginTop="-5dp"
             android:layout_marginStart="10dp"/>
-
         <TextView
             android:id="@+id/resCuisines"
             android:layout_width="wrap_content"
@@ -110,7 +108,5 @@
                 android:text="+90 555 555 55 55"
                 android:textSize="16sp" />
         </LinearLayout>
-
     </RelativeLayout>
-
 </androidx.cardview.widget.CardView>
