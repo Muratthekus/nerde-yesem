@@ -245,6 +245,7 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
 
         activity?.supportFragmentManager?.beginTransaction()
             ?.replace(R.id.mainActivity_FrameLayout,FragmentDetailedScreen())
+            ?.addToBackStack(getString(R.string.fragment_detailed))
             ?.commit()
 
     }

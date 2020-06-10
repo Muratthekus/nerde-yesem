@@ -99,6 +99,7 @@ class FragmentLoginScreen : Fragment() {
         if(loginHelper.isSuccess){
             activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.mainActivity_FrameLayout,FragmentHomeScreen())
+                .addToBackStack(getString(R.string.fragment_home))
                 .commit()
         }
         else{

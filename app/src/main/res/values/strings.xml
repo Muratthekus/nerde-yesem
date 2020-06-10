@@ -25,4 +25,10 @@
     <string name="average">Ortalama</string>
     <string name="good">İyi</string>
     <string name="excellent">Mükemmel</string>
+
+    <!--FRAGMENT NAMES-->
+    <string name="fragment_login">Fragment Login</string>
+    <string name="fragment_home">Fragment Home</string>
+    <string name="fragment_detailed">Fragment Detailed</string>
+
 </resources>
