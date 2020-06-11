@@ -24,6 +24,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="10dp">
+
+            <ImageView
+                android:id="@+id/shareRest"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/ic_share_black_24dp"
+                android:contentDescription="Share"
+                app:layout_constraintLeft_toRightOf="@id/restName"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/restName"
                 android:layout_width="wrap_content"
@@ -34,7 +46,7 @@
                 android:layout_marginTop="5dp"
                 android:text="Restaurant Adı"
                 android:textStyle="bold"
-                android:textSize="20sp"
+                android:textSize="19sp"
                 style="@style/TextAppearance.AppCompat.Body1"/>
             <TextView
                 android:id="@+id/restCuisines"

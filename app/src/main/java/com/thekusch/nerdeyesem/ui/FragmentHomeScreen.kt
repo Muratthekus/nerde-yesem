@@ -104,7 +104,7 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
             networkProcess(mService.getLocation().second,mService.getLocation().first)
         }
         else{
-            handler.postDelayed(waitServiceConnectionRunn,100)
+            handler.postDelayed(waitServiceConnectionRunn,10)
         }
 
     }

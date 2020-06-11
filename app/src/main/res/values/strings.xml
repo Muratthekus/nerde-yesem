@@ -20,6 +20,8 @@
     <string name="request_error_try_later_will_fix_it">Bir hata oluştu. Sorunu çözmeye çalışıyoruz. Daha sonra tekrar deneyin</string>
     <string name="top_cousines_in_here">Bu bölgedeki popüler mutfaklar:</string>
     <string name="waiting_for_gps_connection">GPS\'in aktif olması bekleniyor</string>
+    <string name="cant_share_photo">Bir hata oldu, daha sonra deneyin</string>
+    <string name="share_with_your_friends">Hadi! Dostlarınla paylaş</string>
     <string name="worse">Berbat</string>
     <string name="bad">Kötü</string>
     <string name="average">Ortalama</string>

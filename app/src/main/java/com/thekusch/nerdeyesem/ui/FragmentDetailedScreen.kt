@@ -1,6 +1,8 @@
 package com.thekusch.nerdeyesem.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -11,16 +13,21 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.thekusch.nerdeyesem.R
+import com.thekusch.nerdeyesem.TakeScreenshot
 import com.thekusch.nerdeyesem.data.Status
 import com.thekusch.nerdeyesem.data.Status.*
 import com.thekusch.nerdeyesem.data.model.detailed.DetailedResult
 import com.thekusch.nerdeyesem.databinding.FragmentDetailedRestaurantBinding
 import com.thekusch.nerdeyesem.viewmodel.NetworkDataClass
 import com.thekusch.nerdeyesem.viewmodel.NetworkViewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class FragmentDetailedScreen:Fragment() {
     private lateinit var binding: FragmentDetailedRestaurantBinding
@@ -50,6 +57,38 @@ class FragmentDetailedScreen:Fragment() {
 
         //16691092
         sendRequest()
+        binding.shareRest.setOnClickListener{
+            val bitmap = TakeScreenshot.takeScreenshotOfRootView(it)
+            saveImage2InternalStrg(bitmap)
+
+        }
+    }
+    private fun saveImage2InternalStrg(bitmap: Bitmap){
+        try{
+            val path = File(requireContext().cacheDir,"images")
+            path.mkdirs()
+            val stream = FileOutputStream("$path/image.png")
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream)
+            stream.close()
+            sharePhoto()
+        }
+        catch (e:IOException){
+            showToast(getString(R.string.cant_share_photo))
+        }
+    }
+    private fun sharePhoto(){
+        val imagePath = File(requireContext().cacheDir, "images");
+        val newFile = File(imagePath, "image.png");
+        val contentUri = FileProvider.getUriForFile(requireContext(), "com.thekusch.nerdeyesem.fileprovider", newFile);
+
+        if (contentUri != null) {
+            val shareIntent = Intent();
+            shareIntent.action = Intent.ACTION_SEND;
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+            shareIntent.setDataAndType(contentUri, requireActivity().contentResolver.getType(contentUri));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_with_your_friends)));
+            }
     }
     private fun sendRequest(){
         networkViewModel.detailedInfoApiConnection(resID)
@@ -59,8 +98,6 @@ class FragmentDetailedScreen:Fragment() {
                 {
                     binding.loadingComponent.visibility = View.GONE
                     binding.pleaseWaitText.visibility = View.GONE
-                    binding.detailedCardView.visibility = View.VISIBLE
-
                     displayData(it)
                 }
                 ERROR ->
@@ -106,6 +143,7 @@ class FragmentDetailedScreen:Fragment() {
             }
         }
         editRestVoteColor(item.data?.userRating?.aggregate_rating?.toDouble())
+        binding.detailedCardView.visibility = View.VISIBLE
     }
     private fun editRestVoteColor(rate:Double?){
         if (rate != null) {
