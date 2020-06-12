@@ -108,14 +108,13 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
     private fun waitRequiredConnections(){
 
         if(this::mService.isInitialized && mService.getLocation().first!=0.0){
-            isInternetConnectionOpen().let {
-                if(it){
-                    handler.removeCallbacks(waitRequiredConnectionsRunn)
-                    networkProcess(mService.getLocation().second,mService.getLocation().first)
-                }
-                else
-                    binding.pleaseWaitText.text = getString(R.string.internet_connection_required)
-                    handler.postDelayed(waitRequiredConnectionsRunn,10)
+            if(isInternetConnectionOpen()){
+                handler.removeCallbacks(waitRequiredConnectionsRunn)
+                networkProcess(mService.getLocation().second,mService.getLocation().first)
+            }
+            else{
+                binding.pleaseWaitText.text = getString(R.string.internet_connection_required)
+                handler.postDelayed(waitRequiredConnectionsRunn,10)
             }
         }
         else{

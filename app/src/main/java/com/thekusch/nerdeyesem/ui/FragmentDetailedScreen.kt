@@ -213,4 +213,9 @@ class FragmentDetailedScreen:Fragment() {
         toast.setGravity(Gravity.CENTER,0,0)
         toast.show()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(waitInternetConnectionRunn)
+    }
 }
