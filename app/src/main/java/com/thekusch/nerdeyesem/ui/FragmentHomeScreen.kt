@@ -1,11 +1,14 @@
 package com.thekusch.nerdeyesem.ui
 
 import android.Manifest
+import android.accounts.NetworkErrorException
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -35,11 +38,14 @@ import com.thekusch.nerdeyesem.viewmodel.ApiDataSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import com.github.ajalt.timberkt.Timber
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.thekusch.nerdeyesem.adapter.RestaurantListAdapter
 import com.thekusch.nerdeyesem.data.Status.*
 import com.thekusch.nerdeyesem.data.model.nearby.NearbyRestaurant
 import com.thekusch.nerdeyesem.viewmodel.NetworkViewModel
 import kotlinx.android.synthetic.main.fragment_detailed_restaurant.view.*
+import java.lang.RuntimeException
 
 
 class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
@@ -55,7 +61,7 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
 
     //Thread
     private val handler = Handler()
-    private var waitServiceConnectionRunn:Runnable = Runnable {waitServiceConnection()}
+    private var waitRequiredConnectionsRunn:Runnable = Runnable {waitRequiredConnections()}
 
     //Recyclerview
     private lateinit var recyclerView:RecyclerView
@@ -96,15 +102,24 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
 
         networkViewModel = ViewModelProviders.of(this).get(NetworkViewModel::class.java)
 
-        handler.post(waitServiceConnectionRunn)
+        handler.post(waitRequiredConnectionsRunn)
     }
-    private fun waitServiceConnection(){
+    //Check service is initialized, location was fetched and internet connection open
+    private fun waitRequiredConnections(){
+
         if(this::mService.isInitialized && mService.getLocation().first!=0.0){
-            handler.removeCallbacks(waitServiceConnectionRunn)
-            networkProcess(mService.getLocation().second,mService.getLocation().first)
+            isInternetConnectionOpen().let {
+                if(it){
+                    handler.removeCallbacks(waitRequiredConnectionsRunn)
+                    networkProcess(mService.getLocation().second,mService.getLocation().first)
+                }
+                else
+                    binding.pleaseWaitText.text = getString(R.string.internet_connection_required)
+                    handler.postDelayed(waitRequiredConnectionsRunn,10)
+            }
         }
         else{
-            handler.postDelayed(waitServiceConnectionRunn,10)
+            handler.postDelayed(waitRequiredConnectionsRunn,10)
         }
 
     }
@@ -127,7 +142,10 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
                 ERROR ->
                 {
                     showToast(getString(R.string.request_error_try_later_will_fix_it))
-                    binding.pleaseWaitText.text = it.msg
+                    FirebaseApp.initializeApp(requireContext())
+                    FirebaseCrashlytics.getInstance()
+                        .recordException(
+                            RuntimeException("Error when try to fetch nearby restaurant. Error message -> ${it.msg}"))
                 }
                 LOADING -> binding.pleaseWaitText.text = getString(R.string.try_to_connect_server)
             }
@@ -143,6 +161,13 @@ class FragmentHomeScreen : Fragment(), RestaurantListAdapter.ItemClickListener {
         text.textSize = 16F
         text.setTextColor(resources.getColor(R.color.white))
         binding.topCuisinesLayout.addView(text)
+    }
+    //Check internet connection
+    private fun isInternetConnectionOpen():Boolean{
+        val connectivityManager = requireActivity()
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).state == NetworkInfo.State.CONNECTED ||
+            connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED
     }
     //Bind service
     private fun serviceConnection(){

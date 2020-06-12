@@ -1,10 +1,14 @@
 package com.thekusch.nerdeyesem.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -17,6 +21,9 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.internal.common.CrashlyticsCore
 import com.thekusch.nerdeyesem.R
 import com.thekusch.nerdeyesem.TakeScreenshot
 import com.thekusch.nerdeyesem.data.Status
@@ -28,12 +35,17 @@ import com.thekusch.nerdeyesem.viewmodel.NetworkViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.lang.RuntimeException
 
 class FragmentDetailedScreen:Fragment() {
     private lateinit var binding: FragmentDetailedRestaurantBinding
 
     private lateinit var networkViewModel: NetworkViewModel
     private var resID:Int? = 0
+
+    //Threads
+    private val handler = Handler()
+    private val waitInternetConnectionRunn = Runnable { waitInternetConnection() }
 
     //SharedPreference
     private lateinit var pref: SharedPreferences
@@ -55,13 +67,29 @@ class FragmentDetailedScreen:Fragment() {
         editor = pref.edit()
         resID = pref.getInt("resID",0)
 
-        //16691092
-        sendRequest()
+        FirebaseApp.initializeApp(requireContext())
+
         binding.shareRest.setOnClickListener{
             val bitmap = TakeScreenshot.takeScreenshotOfRootView(it)
             saveImage2InternalStrg(bitmap)
-
         }
+        handler.post(waitInternetConnectionRunn)
+    }
+    private fun waitInternetConnection(){
+        if(isInternetConnectionOpen()){
+            handler.removeCallbacks(waitInternetConnectionRunn)
+            sendRequest()
+        }
+        else{
+            binding.pleaseWaitText.text = getString(R.string.internet_connection_required)
+            handler.postDelayed(waitInternetConnectionRunn,100)
+        }
+    }
+    private fun isInternetConnectionOpen():Boolean{
+        val connectivityManager = requireActivity()
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).state == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).state == NetworkInfo.State.CONNECTED
     }
     private fun saveImage2InternalStrg(bitmap: Bitmap){
         try{
@@ -73,6 +101,9 @@ class FragmentDetailedScreen:Fragment() {
             sharePhoto()
         }
         catch (e:IOException){
+            FirebaseCrashlytics.getInstance()
+                .recordException(
+                    IOException("Error when save image to internal storage. Error message -> $e"))
             showToast(getString(R.string.cant_share_photo))
         }
     }
@@ -88,7 +119,12 @@ class FragmentDetailedScreen:Fragment() {
             shareIntent.setDataAndType(contentUri, requireActivity().contentResolver.getType(contentUri));
             shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_with_your_friends)));
-            }
+        }
+        else{
+            FirebaseCrashlytics.getInstance()
+                .recordException(
+                    RuntimeException("Image successfully saved to internal storage but can not get it"))
+        }
     }
     private fun sendRequest(){
         networkViewModel.detailedInfoApiConnection(resID)
@@ -103,7 +139,10 @@ class FragmentDetailedScreen:Fragment() {
                 ERROR ->
                 {
                     showToast(getString(R.string.request_error_try_later_will_fix_it))
-                    binding.pleaseWaitText.text = it.msg
+
+                    FirebaseCrashlytics.getInstance()
+                        .recordException(
+                            RuntimeException("Error when try to fetch detailed info of the restaurant. Error message -> ${it.msg}"))
                 }
                 LOADING -> binding.pleaseWaitText.text = getString(R.string.try_to_connect_server)
             }

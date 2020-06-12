@@ -165,7 +165,7 @@
                 app:layout_constraintTop_toBottomOf="@id/restPhone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:drawableLeft="@drawable/ic_whatshot_black_24dp"
                 android:text="Öne çıkanlar"
                 android:gravity="center"

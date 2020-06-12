@@ -13,8 +13,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Pair
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.ajalt.timberkt.Timber
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import java.lang.RuntimeException
 
 class LocationListenerService : Service(), LocationListener {
     private lateinit var locationManager:LocationManager
@@ -58,6 +62,11 @@ class LocationListenerService : Service(), LocationListener {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Timber.d{"Permission not granted, service stop"}
+            FirebaseApp.initializeApp(applicationContext)
+            FirebaseCrashlytics.getInstance()
+                .recordException(
+                    RuntimeException("Service bound, before permission granted")
+                )
             stopSelf()
             return
         }

@@ -18,6 +18,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.thekusch.nerdeyesem.databinding.FragmentLoginScreenBinding
 import java.security.KeyStore
 import javax.crypto.Cipher

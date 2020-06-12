@@ -1,10 +1,8 @@
 package com.thekusch.nerdeyesem.viewmodel
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.thekusch.nerdeyesem.data.Resource
 import com.thekusch.nerdeyesem.data.Status.*
 import com.thekusch.nerdeyesem.data.model.detailed.DetailedResult
 import com.thekusch.nerdeyesem.data.model.nearby.NearbyResult
@@ -48,4 +46,6 @@ class NetworkViewModel: ViewModel(){
                 }
             }
     }
+
+
 }
